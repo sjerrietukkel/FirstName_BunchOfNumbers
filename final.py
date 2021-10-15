@@ -8,7 +8,7 @@ with open("data/dutch_names.json", 'r') as file:
     names = json.load(file)
 
 # initializing string 
-test_str = "Bert9498"
+test_str = "Bet9498"
 
 def has_numbers(twitter_handle):
     return any(char.isdigit() for char in twitter_handle)
@@ -30,7 +30,7 @@ def nameCheck(twitter_handle):
                 first_name = True
             if first_name == True and bunch_of_numbers == True:
                 return True
-            elif first_name == False or bunch_of_numbers == False:
+            elif first_name or bunch_of_numbers == False:
                 return False
     else: 
         return False 
