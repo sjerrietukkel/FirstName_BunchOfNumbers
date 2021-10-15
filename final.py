@@ -8,35 +8,42 @@ with open("data/dutch_names.json", 'r') as file:
     names = json.load(file)
 
 # initializing string 
-test_str = "Bet9498"
+test_str = "Daniel1997"
 
 def has_numbers(twitter_handle):
     return any(char.isdigit() for char in twitter_handle)
 
-def nameCheck(twitter_handle):  
+def has_letters(twitter_handle):
+    return any(char.isalpha() for char in twitter_handle)
+
+def nameCheck(twitter_handle, amount_of_numbers):  
     if has_numbers(twitter_handle) == True:
-        temp = re.compile("([a-zA-Z]+)([0-9]+)")    # Using re.compile() + re.match() + re.groups()
-        res = temp.match(twitter_handle).groups()         # Splitting text and number in string
-        numbercheck = res[1]
-        numbercheck = len(numbercheck)
-        if numbercheck > 3:
-            bunch_of_numbers = True
-        else: 
-            bunch_of_numbers = False
-        for name in names:
-            name = name["name"]
-            first_name = False
-            if res[0] == name:
-                first_name = True
-            if first_name == True and bunch_of_numbers == True:
-                return True
-            elif first_name or bunch_of_numbers == False:
+        if has_letters(twitter_handle) == True:
+            temp = re.compile("([a-zA-Z]+)([0-9]+)")    # Using re.compile() + re.match() + re.groups()
+            res = temp.match(twitter_handle).groups()         # Splitting text and number in string
+            numbercheck = res[1]
+            numbercheck = len(numbercheck)
+            if numbercheck >= amount_of_numbers:
+                bunch_of_numbers = True
+            else: 
+                bunch_of_numbers = False
+            for name in names:
+                first_name = False
+                if res[0] == name["name"]:
+                    first_name = True
+                if first_name == True and bunch_of_numbers == True:
+                    exit
+                    return True
+            else:
                 return False
+        else:
+            return False
     else: 
         return False 
 
 # nameCheck(test_str)
-print(nameCheck(test_str))
+print(nameCheck(test_str, 4))
+
 
 auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"])
 auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
