@@ -1,8 +1,15 @@
+from math import inf
 import tweepy
 import json
 import re
 from dotenv import dotenv_values
 config = dotenv_values(".env")
+auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"])
+auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
+api = tweepy.API(auth)
+
+query = "Mijn 1ste vliegen zwammen, oh zo blij mee "
+data = []
 
 with open("data/dutch_names.json", 'r') as file:
     NAMES = json.load(file)
@@ -39,17 +46,7 @@ def nameCheck(twitter_handle, amount_of_numbers):  # returns bool
     else: 
         return False 
 
-auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"])
-auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
-
-api = tweepy.API(auth)
-query = "Mijn 1ste vliegen zwammen, oh zo blij mee "
-
-data = []
-
-names = []
-
-for tweets in tweepy.Cursor(api.search_tweets, q=query, count=30, lang="nl", result_type="latest").pages(1):
+for tweets in tweepy.Cursor(api.search_tweets, q=query, count=30, lang="nl", result_type="latest").pages(limit=inf):
     for tweet in tweets:
         tweet = tweet._json
         twitter_handle = tweet["user"]["screen_name"]
