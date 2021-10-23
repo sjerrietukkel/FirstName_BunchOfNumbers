@@ -1,5 +1,7 @@
 from google.cloud import language_v1
 
+retrieved_tweet = "Sample text to analyse the sentiment"
+
 def sample_analyze_sentiment(text_content):
     """
     Analyzing Sentiment in a String
@@ -18,7 +20,7 @@ def sample_analyze_sentiment(text_content):
     # Optional. If not specified, the language is automatically detected.
     # For list of supported languages:
     # https://cloud.google.com/natural-language/docs/languages
-    language = "en"
+    language = ""
     document = {"content": text_content, "type_": type_, "language": language}
 
     # Available values: NONE, UTF8, UTF16, UTF32
@@ -43,4 +45,4 @@ def sample_analyze_sentiment(text_content):
     # the automatically-detected language.
     print(u"Language of the text: {}".format(response.language))
 
-sample_analyze_sentiment("Hello, my name is Daniel and i'm very happy!")
+sample_analyze_sentiment(retrieved_tweet)

@@ -7,12 +7,13 @@ git clone
 pip install tweepy
 pip install dotenv
 pip install google-cloud
+pip install dash dash-renderer dash_html_components dash_core_components
 ```
 
 Request api keys: https://developer.twitter.com/ \
 Store keys in `.env`.
 
-```env
+```bash
 CONSUMER_KEY = 'YOUR_KEY'
 CONSUMER_KEY_SECRET = 'YOUR_KEY'
 ACCESS_TOKEN = 'YOUR_KEY'
