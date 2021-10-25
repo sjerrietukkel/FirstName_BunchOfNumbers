@@ -25,7 +25,7 @@ def translate_text(target, text):
     print(u"Translation: {}".format(result["translatedText"]))
     print(u"Detected source language: {}".format(result["detectedSourceLanguage"]))
     translation = result["translatedText"]
-    return translation
+    return translation, result
 
 def sample_analyze_sentiment(text_content):
     """
@@ -69,6 +69,3 @@ def sample_analyze_sentiment(text_content):
     # the language specified in the request or, if not specified,
     # the automatically-detected language.
     print(u"Language of the text: {}".format(response.language))
-
-translation = translate_text('en', retrieved_tweet)
-sample_analyze_sentiment(translation)
