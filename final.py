@@ -1,6 +1,7 @@
 import string, tweepy, json, re
 from dotenv import dotenv_values
-# from sentiment import sample_analyze_sentiment, translate_text
+from sentiment import analyze_sentiment, translate_text
+from nltk.tokenize import WordPunctTokenizer
 
 config = dotenv_values(".env")
 auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"])
@@ -88,5 +89,25 @@ for tweets in tweepy.Cursor(api.search_tweets, q=query, count=100, lang="nl", tw
 
 print(total)
 filename = 'data/tweets_hash.json'
-with open (filename, 'w') as outfile:
+with open (filename, 'w', encoding='utf8') as outfile:
     json.dump(data, outfile)
+
+with open('data/tweets_hash.json', 'r') as file:
+    tweets = json.load(file)
+
+def clean_tweets(tweet):
+    user_removed = re.sub(r'@[A-Za-z0-9]+','',tweet)
+    link_removed = re.sub('https?://[A-Za-z0-9./]+','',user_removed)
+    number_removed = re.sub('[^a-zA-Z]', ' ', link_removed)
+    lower_case_tweet= number_removed.lower()
+    tok = WordPunctTokenizer()
+    words = tok.tokenize(lower_case_tweet)
+    clean_tweet = (' '.join(words)).strip()
+    return clean_tweet
+
+for tweet in tweets:
+    text = tweet["text"]
+    translation = translate_text('en', text)
+    clean_tweet = clean_tweets(translation)
+    analyze_sentiment(clean_tweet)
+    print("")
