@@ -26,6 +26,8 @@ def analyze_sentiment(text_content):
     encoding_type = language_v1.EncodingType.UTF8
     response = client.analyze_sentiment(request = {'document': document, 'encoding_type': encoding_type})
     # Get overall sentiment of the input document
+    doc_score = response.document_sentiment.score
+    doc_mag = response.document_sentiment.magnitude
     print(u"Document sentiment score: {}".format(response.document_sentiment.score))
     print(
         u"Document sentiment magnitude: {}".format(
@@ -39,3 +41,4 @@ def analyze_sentiment(text_content):
         print(u"Sentence sentiment magnitude: {}".format(sentence.sentiment.magnitude))
 
     print(u"Language of the text: {}".format(response.language))
+    return doc_score, doc_mag
