@@ -6,7 +6,7 @@
 git clone
 pip install tweepy
 pip install dotenv
-pip install google-cloud
+pip install google-cloud google-cloud-translate==2.0.1
 pip install dash dash-renderer dash_html_components dash_core_components
 ```
 

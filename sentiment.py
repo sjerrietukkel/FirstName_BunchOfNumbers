@@ -1,6 +1,31 @@
 from google.cloud import language_v1
 
-retrieved_tweet = "Sample text to analyse the sentiment"
+retrieved_tweet = "Wie zit er \u00e9cht te wachten op een #coronapas? Niet de bevolking en al zeker niet de reeds zwaar getroffen horecasector."
+
+
+def translate_text(target, text):
+    """Translates text into the target language.
+
+    Target must be an ISO 639-1 language code.
+    See https://g.co/cloud/translate/v2/translate-reference#supported_languages
+    """
+    import six
+    from google.cloud import translate_v2 as translate
+
+    translate_client = translate.Client()
+
+    if isinstance(text, six.binary_type):
+        text = text.decode("utf-8")
+
+    # Text can also be a sequence of strings, in which case this method
+    # will return a sequence of results for each text.
+    result = translate_client.translate(text, target_language=target)
+
+    print(u"Text: {}".format(result["input"]))
+    print(u"Translation: {}".format(result["translatedText"]))
+    print(u"Detected source language: {}".format(result["detectedSourceLanguage"]))
+    translation = result["translatedText"]
+    return translation
 
 def sample_analyze_sentiment(text_content):
     """
@@ -45,4 +70,5 @@ def sample_analyze_sentiment(text_content):
     # the automatically-detected language.
     print(u"Language of the text: {}".format(response.language))
 
-sample_analyze_sentiment(retrieved_tweet)
+translation = translate_text('en', retrieved_tweet)
+sample_analyze_sentiment(translation)
