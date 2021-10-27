@@ -46,33 +46,35 @@ def nameCheck(twitter_handle, amount_of_numbers):  # returns bool
                     bunch_of_numbers = True
                 else: 
                     bunch_of_numbers = False
-                    return False
+                    return False,0
                 if bunch_of_numbers == True:
                     first_name = res[0]
                     for name in NAMES:
                         if first_name == name["name"]:
-                            return True
+                            gender = name["gender"]
+                            return True, gender
                     else:
-                        return False
+                        return False, 0
                 else:
-                    return False
+                    return False, 0
             else:
-                return False
+                return False, 0
         else: 
-            return False
+            return False, 0
     else: 
-        return False  
+        return False, 0
 
-for tweets in tweepy.Cursor(api.search_tweets, q=query, count=50, lang="nl", tweet_mode='extended', result_type="latest").pages(1):
+for tweets in tweepy.Cursor(api.search_tweets, q=query, count=100, lang="nl", tweet_mode='extended', result_type="latest").pages(5):
     total = 0
+    total_found = 0
     for tweet in tweets:
         tweet = tweet._json
         twitter_handle = tweet["user"]["screen_name"]
         twitter_handle = ''.join(filter(str.isalnum, twitter_handle))
         print(twitter_handle)
-        name_check = nameCheck(twitter_handle, 2)
+        name_check_pass, gender = nameCheck(twitter_handle, 2)
         total = total + 1
-        if name_check == True:
+        if name_check_pass == True:
             print("We caught one!")
             text = tweet["full_text"]
             rt = text.startswith('RT')
@@ -83,8 +85,12 @@ for tweets in tweepy.Cursor(api.search_tweets, q=query, count=50, lang="nl", twe
                 clean_tweet = clean_tweets(translation)
                 sentiment = analyze_sentiment(clean_tweet)
                 print(sentiment)
+                total_found = total_found + 1
                 data.append({   
+                    'query': query,
+                    'date' : tweet["created_at"],
                     'screen_name' : tweet["user"]["screen_name"],
+                    'gender' : gender,
                     'text' : tweet["retweeted_status"]["full_text"],
                     "followers" : tweet["user"]["followers_count"],
                     "retweet" : True,
@@ -98,8 +104,12 @@ for tweets in tweepy.Cursor(api.search_tweets, q=query, count=50, lang="nl", twe
                 translation = translate_text('en', text)
                 clean_tweet = clean_tweets(translation)
                 sentiment = analyze_sentiment(clean_tweet)
+                total_found = total_found + 1
                 data.append({
+                    'query': query,
+                    'date' : tweet["created_at"],
                     'screen_name' : tweet["user"]["screen_name"],
+                    'gender' : gender,
                     'text' : tweet["full_text"],
                     "followers" : tweet["user"]["followers_count"],
                     "retweet" : False,
@@ -115,15 +125,3 @@ print(total)
 filename = 'data/tweets_hash.json'
 with open (filename, 'w', encoding='utf8') as outfile:
     json.dump(data, outfile)
-
-# with open('data/tweets_hash.json', 'r') as file:
-#     tweets = json.load(file)
-
-
-
-# for tweet in tweets:
-#     text = tweet["text"]
-#     translation = translate_text('en', text)
-#     clean_tweet = clean_tweets(translation)
-#     analyze_sentiment(clean_tweet)
-#     print("")
