@@ -8,7 +8,7 @@ auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"]
 auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
 api = tweepy.API(auth)
 
-query = "coronapas"
+query = "coronamaatregelen"
 data = []
 
 with open("data/dutch_names.json", 'r') as file:
@@ -46,7 +46,7 @@ def nameCheck(twitter_handle, amount_of_numbers):  # returns bool
                     bunch_of_numbers = True
                 else: 
                     bunch_of_numbers = False
-                    return False,0
+                    return False, 0
                 if bunch_of_numbers == True:
                     first_name = res[0]
                     for name in NAMES:

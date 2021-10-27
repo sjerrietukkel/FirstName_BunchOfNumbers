@@ -1,3 +1,5 @@
+import math
+from numpy import average
 import pandas as pd
 import plotly.express as px
 import dash
@@ -6,20 +8,50 @@ from dash import html
 from dash.dependencies import Input, Output, State
 
 df = pd.read_json("data/tweets_hash.json")
+print(df)
 sentiment = df["sentiment"]
 fol = df["followers"]
 app = dash.Dash(__name__)
 fig = px.density_heatmap(df, x=sentiment, y=fol)
 
+count = df["text"].count()
+total_count = (count/1000) * 100
+retweet_count = df["retweet"].mean()
+retweet_count = math.ceil(retweet_count * 100)
+male_count = df['gender'].value_counts(normalize=True).mul(100)
+male_perc = math.ceil(male_count["male"])
+average_followers = math.ceil((df["followers"].sum()) / count)
+
+
 print(df["sentiment"])
 app.layout = html.Div(
     children=[
+        html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
+        html.H2("Select a #hashtag and I’ll tell you all about it. "),
         dcc.Input(
             id="search_input".format("search"),
             type="search",
             placeholder="e.g. coronapas".format("search")
         ),
-        html.Button(id='my-button', n_clicks=0, children="Search"),
+        html.Div(className="flex-bar", children=[
+            html.Div(className="flex-bar", children=[
+                html.H3(str(total_count) + "%", className="red percentage"),
+                html.H4("all retrieved tweets", className="percentage_expl"),
+            ]),
+            html.Div(className="flex-bar" ,children=[
+                html.H3(str(retweet_count) + "%", className="red percentage"),
+                html.H4("consists of retweets", className="percentage_expl"),
+            ]),
+            html.Div(className="flex-bar", children=[
+                html.H3(str(male_perc) + "%", className="red percentage"),
+                html.H4("is male", className="percentage_expl"),
+            ]),
+            html.Div(className="flex-bar", children=[
+                html.H3(average_followers, className="red percentage"),
+                html.H4("average followers", className="percentage_expl"),
+            ]),
+        ]),
+        # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
         dcc.Graph(id="heatmap", figure=fig)
     ]
