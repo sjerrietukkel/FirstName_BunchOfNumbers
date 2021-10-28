@@ -53,7 +53,7 @@ app.layout = html.Div(
         ]),
         # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
-        dcc.Graph(id="heatmap", figure=fig)
+        dcc.Graph(id="heatmap", figure=fig, className="graph-style")
     ]
 )
 

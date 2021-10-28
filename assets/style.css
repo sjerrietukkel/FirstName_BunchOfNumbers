@@ -56,3 +56,13 @@ h2 {
     align-self: center;
     margin-left: 16px;
 }
+
+#heatmap {
+    background-color: #ECE5D8;
+    border: 1px solid #171a2f;
+    border-radius: 8px;
+}
+
+.main-svg {
+    background-color: transparent !important;
+ }
