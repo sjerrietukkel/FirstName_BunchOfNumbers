@@ -15,7 +15,7 @@ with open("names/dutch_names.json", 'r') as file:
     NAMES = json.load(file)
 
 def has_numbers(twitter_handle):
-    return any(char.isdigit() for char in twitter_handle)
+    return any(char.isdigit() for char in twitter_handle) 
 
 def has_letters(twitter_handle):
     return any(char.isalpha() for char in twitter_handle)
