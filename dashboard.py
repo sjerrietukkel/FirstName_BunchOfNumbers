@@ -8,6 +8,7 @@ import glob
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
+colorscales = px.colors.named_colorscales()
 
 def merge_JsonFiles():
     total_tweet_count = 0
@@ -22,11 +23,24 @@ def merge_JsonFiles():
 totaltweets = merge_JsonFiles()
 
 df = pd.read_json("all_tweets.json")
-# print(df)
+print(df)
 sentiment = df["sentiment"]
 fol = df["followers"]
 app = dash.Dash(__name__)
-fig = px.density_heatmap(df, x=sentiment, y=fol)
+fig = px.density_heatmap(
+            df,
+            x=sentiment,
+            y=fol,
+            nbinsx= 40,
+            nbinsy= 20,
+            marginal_x="box",
+            marginal_y="violin",
+            color_continuous_scale= [ "#004369","#F4E683", "#FDA649",  "#FF8882","#fd5445"]
+)
+
+fig.update_layout(
+    plot_bgcolor='ghostwhite',
+)
 
 
 # top bar information about the entire dataset
@@ -44,53 +58,63 @@ app.layout = html.Div(
     children=[
         html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
         html.H2("Select a #hashtag and I’ll tell you all about it. "),
-        dcc.Input(
-            id="search_input".format("search"),
-            type="search",
-            placeholder="e.g. coronapas".format("search")
+        # dcc.Input(
+        #     id="search_input".format("search"),
+        #     type="search",
+        #     placeholder="e.g. coronapas".format("search")
+        # ),
+        dcc.Dropdown(
+            id="search_input",
+            options= [
+                {'label': "Coronapas", 'value': 'coronapas'},
+                {'label': "Onana", 'value': 'onana'},
+                {'label': "Coronamaatregelen", 'value': 'coronamaatregelen'},
+                {'label': "Nieuwsuur", 'value': 'nieuwsuur'},
+            ],
+            value="coronapas"
         ),
+        html.H4("Information about all retreived tweets :", className="information-bar"),
         html.Div(className="flex-bar", children=[
-            html.Div(className="flex-bar", children=[
+            html.Div(className="flex-bar perc-back", children=[
                 html.H3(str(total_count) + "%", className="red percentage"),
                 html.H4("all retrieved tweets", className="percentage_expl"),
             ]),
-            html.Div(className="flex-bar" ,children=[
+            html.Div(className="flex-bar perc-back" ,children=[
                 html.H3(str(retweet_count) + "%", className="red percentage"),
                 html.H4("consists of retweets", className="percentage_expl"),
             ]),
-            html.Div(className="flex-bar", children=[
+            html.Div(className="flex-bar perc-back", children=[
                 html.H3(str(male_perc) + "%", className="red percentage"),
-                html.H4("is male", className="percentage_expl"),
+                html.H4("first name is male", className="percentage_expl"),
             ]),
-            html.Div(className="flex-bar", children=[
+            html.Div(className="flex-bar perc-back", children=[
                 html.H3(average_followers, className="red percentage"),
                 html.H4("average followers", className="percentage_expl"),
+            ]),
+            html.Div(className="flex-bar perc-back", children=[
+                html.H3(totaltweets, className="red percentage"),
+                html.H4("tweets scanned", className="percentage_expl"),
             ]),
         ]),
         # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
-        dcc.Graph(id="heatmap", figure=fig, className="graph-style")
+        dcc.Graph(
+            id="heatmap",
+            className="graph-style",
+            figure=fig,
+        ),
     ]
 )
 
 @app.callback(
-    Output(component_id='graph-output', component_property='figure'),
-    # [Input(component_id='search_input', component_property='value')],
-    [Input(component_id='my-button', component_property='n_clicks')],
-    [State(component_id='search_input', component_property='value')],
-    prevent_initial_call=True
+    Output("genre-graph", "figure"),
+    [Input("search_input", "value")]
 )
-def update_my_graph(n, val_chosen):
-    if len(val_chosen) > 0:
-        # print(n)
-        print(f"value user chose: {val_chosen}")
-        print(type(val_chosen))
-        dff = df[df["fund_extended_name"].isin(val_chosen)]
-        fig = px.pie(dff, values="ytd_return", names="fund_extended_name", title="Year-to-Date Returns")
-        fig.update_traces(textinfo="value+percent").update_layout(title_x=0.5)
-        return fig
-    elif len(val_chosen) == 0:
-        raise dash.exceptions.PreventUpdate
+def updateFigure(value):
+    df_platform = df[df["Platform"] == value]
+    df_genres = df_platform.groupby("Genre").size().reset_index(name="Count")
+    fig_genre = px.pie(df_genres, values = "Count", names="Genre", title="Fancy Title")
+    return fig_genre
 
 
 if __name__ == '__main__':

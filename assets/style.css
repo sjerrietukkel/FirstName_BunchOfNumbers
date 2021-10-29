@@ -20,6 +20,8 @@
 body {
     background-color: #ECE5D8;
     padding: 0 50px;
+    max-width: 1600px;
+    margin: auto;
 }
 
 h1 {
@@ -44,7 +46,8 @@ h2 {
 
 .flex-bar {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .percentage {
@@ -58,11 +61,24 @@ h2 {
 }
 
 #heatmap {
-    background-color: #ECE5D8;
-    border: 1px solid #171a2f;
+    background-color: white;
+    /* border: 1px solid #171a2f; */
+    margin: 0 32px;
     border-radius: 8px;
 }
 
 .main-svg {
     background-color: transparent !important;
+ }
+
+.perc-back {
+    background-color: white;
+    border-radius: 8px;
+    padding: 0 16px;
+    margin: 16px 8px;
+}
+
+ .information-bar {
+     margin-top: 32px;
+     margin-bottom: 0;
  }
