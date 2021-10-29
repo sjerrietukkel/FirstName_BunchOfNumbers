@@ -7,6 +7,9 @@ import glob
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
+app = dash.Dash(__name__)
+server = app.server
+
 
 def merge_JsonFiles():
     total_tweet_count = 0
@@ -35,7 +38,7 @@ print(df_fol["followers"])
 print(df)
 sentiment = df_fol["sentiment"]
 fol = df_fol["followers"]
-app = dash.Dash(__name__)
+
 fig = px.density_heatmap(
             df,
             title="Sentiment compared with amount of followers.",
@@ -122,6 +125,6 @@ def updateFigure(value):
     fig_genre = px.pie(df_genres, values = "Count", names="Genre", title="Fancy Title")
     return fig_genre
 
-server = app.server
+
 if __name__ == '__main__':
     app.run_server()
