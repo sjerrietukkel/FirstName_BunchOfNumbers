@@ -7,7 +7,6 @@ import glob
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
-colorscales = px.colors.named_colorscales()
 
 def merge_JsonFiles():
     total_tweet_count = 0
@@ -123,6 +122,6 @@ def updateFigure(value):
     fig_genre = px.pie(df_genres, values = "Count", names="Genre", title="Fancy Title")
     return fig_genre
 
-
+server = app.server
 if __name__ == '__main__':
     app.run_server(debug=True)
