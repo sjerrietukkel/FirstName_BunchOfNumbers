@@ -35,6 +35,10 @@ h2 {
     font-weight: 500;
 }
 
+.main {
+    margin: 16px;
+}
+
 #search_input {
     width: 100%;
     padding: 0 8px;
@@ -63,7 +67,6 @@ h2 {
 #heatmap {
     background-color: white;
     /* border: 1px solid #171a2f; */
-    margin: 0 32px;
     border-radius: 8px;
 }
 

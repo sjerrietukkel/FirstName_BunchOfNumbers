@@ -23,15 +23,27 @@ def merge_JsonFiles():
 totaltweets = merge_JsonFiles()
 
 df = pd.read_json("all_tweets.json")
+
+# remove follower outliers
+cols = ['followers'] # one or more
+
+Q1 = df[cols].quantile(0)
+Q3 = df[cols].quantile(0.8)
+IQR = Q3 - Q1
+
+df_fol = df[~((df[cols] < (Q1 - 1.5 * IQR)) |(df[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
+
+print(df_fol["followers"])
 print(df)
-sentiment = df["sentiment"]
-fol = df["followers"]
+sentiment = df_fol["sentiment"]
+fol = df_fol["followers"]
 app = dash.Dash(__name__)
 fig = px.density_heatmap(
             df,
+            title="Sentiment compared with amount of followers.",
             x=sentiment,
             y=fol,
-            nbinsx= 40,
+            nbinsx= 20,
             nbinsy= 20,
             marginal_x="box",
             marginal_y="violin",
@@ -44,8 +56,8 @@ fig.update_layout(
 
 
 # top bar information about the entire dataset
-count = df["text"].count()
-total_count = (count/totaltweets) * 100
+count = df["screen_name"].count()
+total_count = round((count/totaltweets) * 100, 1)
 retweet_count = df["retweet"].mean()
 retweet_count = math.ceil(retweet_count * 100)
 male_count = df['gender'].value_counts(normalize=True).mul(100)
@@ -55,14 +67,10 @@ average_followers = math.ceil((df["followers"].sum()) / count)
 
 print(df["sentiment"])
 app.layout = html.Div(
+    className="main",
     children=[
         html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
         html.H2("Select a #hashtag and I’ll tell you all about it. "),
-        # dcc.Input(
-        #     id="search_input".format("search"),
-        #     type="search",
-        #     placeholder="e.g. coronapas".format("search")
-        # ),
         dcc.Dropdown(
             id="search_input",
             options= [
