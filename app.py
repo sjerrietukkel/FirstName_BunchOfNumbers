@@ -1,5 +1,4 @@
 import math
-from numpy import average
 import pandas as pd
 import plotly.express as px
 import dash
