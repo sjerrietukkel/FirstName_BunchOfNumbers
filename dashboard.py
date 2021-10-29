@@ -3,19 +3,35 @@ from numpy import average
 import pandas as pd
 import plotly.express as px
 import dash
+import json
+import glob
 from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 
-df = pd.read_json("data/tweets_hash.json")
-print(df)
+def merge_JsonFiles():
+    total_tweet_count = 0
+    result = list()
+    for filename in glob.iglob('data/*.json', recursive=True):
+        total_tweet_count = total_tweet_count + 1000
+        with open(filename, 'r') as infile:
+            result.extend(json.load(infile))
+    with open('all_tweets.json', 'w') as output_file:
+        json.dump(result, output_file)
+    return total_tweet_count
+totaltweets = merge_JsonFiles()
+
+df = pd.read_json("all_tweets.json")
+# print(df)
 sentiment = df["sentiment"]
 fol = df["followers"]
 app = dash.Dash(__name__)
 fig = px.density_heatmap(df, x=sentiment, y=fol)
 
+
+# top bar information about the entire dataset
 count = df["text"].count()
-total_count = (count/1000) * 100
+total_count = (count/totaltweets) * 100
 retweet_count = df["retweet"].mean()
 retweet_count = math.ceil(retweet_count * 100)
 male_count = df['gender'].value_counts(normalize=True).mul(100)

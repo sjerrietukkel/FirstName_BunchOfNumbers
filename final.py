@@ -8,10 +8,10 @@ auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"]
 auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
 api = tweepy.API(auth)
 
-query = "coronamaatregelen"
+query = "nieuwsuur"
 data = []
 
-with open("data/dutch_names.json", 'r') as file:
+with open("names/dutch_names.json", 'r') as file:
     NAMES = json.load(file)
 
 def has_numbers(twitter_handle):
@@ -122,6 +122,6 @@ for tweets in tweepy.Cursor(api.search_tweets, q=query, count=100, lang="nl", tw
         
 
 print(total)
-filename = 'data/tweets_hash.json'
+filename = 'data/tweets_' + query +'.json'
 with open (filename, 'w', encoding='utf8') as outfile:
     json.dump(data, outfile)
