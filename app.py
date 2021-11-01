@@ -29,27 +29,45 @@ df = pd.read_json("all_tweets.json")
 cols = ['followers'] # one or more
 
 Q1 = df[cols].quantile(0)
-Q3 = df[cols].quantile(0.8)
+Q3 = df[cols].quantile(0.9)
 IQR = Q3 - Q1
 
 df_fol = df[~((df[cols] < (Q1 - 1.5 * IQR)) |(df[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-print(df_fol["followers"])
-print(df)
+# print(df_fol["followers"])
+# print(df)
 sentiment = df_fol["sentiment"]
 fol = df_fol["followers"]
 
+df_sen_avg = df
+df_temp = df.groupby('query').size().to_frame('count')
+df_temp = df_temp.iloc[1:, :]
+print(df_temp)
+df_sen_avg = df_sen_avg.groupby(["query", "gender"],)["sentiment"].agg(["mean", "count"]).reset_index()
+# df_sen_avg["count"] = df_temp["count"]
+
+
+# s = df_temp['item_id'].map(df_item.set_index('item_id')['item_name'])
+# df = df_bill.drop('item_id', 1).assign(item_name = s)
+
+
+print(df_sen_avg)
+# print(df_gen_avg)
+print("hierboven")
+
 fig = px.density_heatmap(
             df,
-            title="Sentiment compared with amount of followers.",
             x=sentiment,
             y=fol,
             nbinsx= 20,
             nbinsy= 20,
-            marginal_x="box",
+            marginal_x="box",   
             marginal_y="violin",
             color_continuous_scale= [ "#004369","#F4E683", "#FDA649",  "#FF8882","#fd5445"]
 )
+
+fig_pie = px.pie(df, values = "sentiment", names="query")
+fig_hist = px.histogram(df_sen_avg, x="mean", y="count", color="gender")
 
 fig.update_layout(
     plot_bgcolor='ghostwhite',
@@ -65,23 +83,10 @@ male_count = df['gender'].value_counts(normalize=True).mul(100)
 male_perc = math.ceil(male_count["male"])
 average_followers = math.ceil((df["followers"].sum()) / count)
 
-
-print(df["sentiment"])
 app.layout = html.Div(
     className="main",
     children=[
         html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
-        html.H2("Select a #hashtag and I’ll tell you all about it. "),
-        dcc.Dropdown(
-            id="search_input",
-            options= [
-                {'label': "Coronapas", 'value': 'coronapas'},
-                {'label': "Onana", 'value': 'onana'},
-                {'label': "Coronamaatregelen", 'value': 'coronamaatregelen'},
-                {'label': "Nieuwsuur", 'value': 'nieuwsuur'},
-            ],
-            value="coronapas"
-        ),
         html.H4("Information about all retreived tweets :", className="information-bar"),
         html.Div(className="flex-bar", children=[
             html.Div(className="flex-bar perc-back", children=[
@@ -107,11 +112,27 @@ app.layout = html.Div(
         ]),
         # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
+        html.H2("Sentiment compared with amount of followers."),
         dcc.Graph(
             id="heatmap",
             className="graph-style",
             figure=fig,
         ),
+        html.H2("Select a #hashtag and I’ll tell you all about it. "),
+        dcc.Dropdown(
+            id="search_input",
+            options= [
+                {'label': "Coronapas", 'value': 'coronapas'},
+                {'label': "Onana", 'value': 'onana'},
+                {'label': "Coronamaatregelen", 'value': 'coronamaatregelen'},
+                {'label': "Nieuwsuur", 'value': 'nieuwsuur'},
+            ],
+            value="coronapas"
+        ),
+        dcc.Graph(
+            id="fig_hist",
+            figure=fig_hist,
+        )
     ]
 )
 
