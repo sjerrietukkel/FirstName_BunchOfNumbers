@@ -2,6 +2,7 @@ import math
 import pandas as pd
 import plotly.express as px
 import dash
+from dash.exceptions import PreventUpdate
 import json 
 import glob
 from dash import dcc
@@ -40,9 +41,9 @@ sentiment = df_fol["sentiment"]
 fol = df_fol["followers"]
 
 df_sen_avg = df
-df_temp = df.groupby('query').size().to_frame('count')
-df_temp = df_temp.iloc[1:, :]
-print(df_temp)
+# df_temp = df.groupby('query').size().to_frame('count')
+# df_temp = df_temp.iloc[1:, :]
+# print(df_temp)
 df_sen_avg = df_sen_avg.groupby(["query", "gender"],)["sentiment"].agg(["mean", "count"]).reset_index()
 # df_sen_avg["count"] = df_temp["count"]
 
@@ -51,9 +52,9 @@ df_sen_avg = df_sen_avg.groupby(["query", "gender"],)["sentiment"].agg(["mean", 
 # df = df_bill.drop('item_id', 1).assign(item_name = s)
 
 
-print(df_sen_avg)
+# print(df_sen_avg)
 # print(df_gen_avg)
-print("hierboven")
+# print("hierboven")
 
 fig = px.density_heatmap(
             df,
@@ -73,6 +74,11 @@ fig.update_layout(
     plot_bgcolor='ghostwhite',
 )
 
+# Create QUERY list for populating dcc.Dropdown()
+QUERY = []
+for o in df["query"]:
+    QUERY.append(o)
+QUERY = list(dict.fromkeys(QUERY))
 
 # top bar information about the entire dataset
 count = df["screen_name"].count()
@@ -86,8 +92,22 @@ average_followers = math.ceil((df["followers"].sum()) / count)
 app.layout = html.Div(
     className="main",
     children=[
-        html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
-        html.H4("Information about all retreived tweets :", className="information-bar"),
+        html.Div(className="white-1", children=[
+            html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
+            html.P("This project is meant to give an insight into the phenomenon FirstName BunchOfNumbers on Twitter. When creating an account this will be the default username generated, making it the prime choice for people with negative outings and bots alike. "),
+            html.P("Caveats to take into consideration: The data is retrieved from Dutch Twitters users and the script will only detect Dutch first names scraped from http://www.naamkunde.net/. The sample data below was gathered amidst the Covid-19 pandemic during October 2021."),
+            html.H3("Stack used:", className="tech"),
+            html.Div(className="flexbar", children=([
+                html.P("Python", className="tag"),
+                html.P("Pandas.py", className="tag"),
+                html.P("Plotly", className="tag"),
+                html.P("Dash", className="tag"),
+                html.P("Twitter API", className="tag"),
+                html.P("Google Natural Languages API", className="tag"),
+                html.P("Heroku", className="tag"),
+            ])),
+        ]),
+        html.H2("Information about all retreived tweets :", className="information-bar"),
         html.Div(className="flex-bar", children=[
             html.Div(className="flex-bar perc-back", children=[
                 html.H3(str(total_count) + "%", className="red percentage"),
@@ -119,33 +139,35 @@ app.layout = html.Div(
             figure=fig,
         ),
         html.H2("Select a #hashtag and I’ll tell you all about it. "),
-        dcc.Dropdown(
-            id="search_input",
-            options= [
-                {'label': "Coronapas", 'value': 'coronapas'},
-                {'label': "Onana", 'value': 'onana'},
-                {'label': "Coronamaatregelen", 'value': 'coronamaatregelen'},
-                {'label': "Nieuwsuur", 'value': 'nieuwsuur'},
-            ],
-            value="coronapas"
-        ),
-        dcc.Graph(
-            id="fig_hist",
-            figure=fig_hist,
-        )
+        html.Div(className="white", children=[
+            dcc.Dropdown(
+                id="search_input",
+                options= [{'label': option, 'value': option}
+                for option in QUERY],
+            ),
+            html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
+            dcc.Graph(
+                id="fig_hist",
+                figure=fig_hist,
+            )
+        ])
     ]
 )
 
 @app.callback(
-    Output("genre-graph", "figure"),
+    Output("fig_hist", "figure"),
     [Input("search_input", "value")]
 )
 def updateFigure(value):
-    df_platform = df[df["Platform"] == value]
-    df_genres = df_platform.groupby("Genre").size().reset_index(name="Count")
-    fig_genre = px.pie(df_genres, values = "Count", names="Genre", title="Fancy Title")
-    return fig_genre
+    df_query = df[df["query"] == value]
+    print(df_query)
+    df_q_count = df_query.groupby("query").count().reset_index()
+    print(df_q_count)
+    df_sen_avg = df_query.groupby(["query", "gender"])["sentiment"].agg([ "count"]).reset_index()
+    # print(df_sen_avg)
+    fig_hist = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet")
+    return fig_hist
 
-
+ 
 if __name__ == '__main__':
     app.run_server()

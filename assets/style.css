@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Zen+Old+Mincho:wght@400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap');
 
 * {
     font-family: 'Zen Old Mincho', serif;
@@ -17,6 +18,35 @@
     color: #171a2f;
 }
 
+.white {
+    background-color: white;
+    border-radius: 8px;
+    padding: 32px;
+}
+
+.white-1 {
+    background-color: white;
+    border-radius: 8px;
+    padding: 8px 16px 32px 16px;
+}
+
+.tag {
+    color: white;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    background-color: #2F5760;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 16px 8px;
+    display: inline-block;
+}
+
+p {
+    font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 400;
+}
+
 body {
     background-color: #ECE5D8;
     padding: 0 50px;
@@ -32,11 +62,16 @@ h1 {
 
 h2 {
     font-size: 20px;
-    font-weight: 500;
+    font-weight: 900;
+}
+
+h3.tech {
+    font-weight: 900;
+    margin-bottom: 0;
 }
 
 .main {
-    margin: 16px;
+    margin: 32px 16px 16px 16px;
 }
 
 #search_input {

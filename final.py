@@ -8,7 +8,7 @@ auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"]
 auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
 api = tweepy.API(auth)
 
-query = "mondkapje" 
+query = "ikdoenietmeermee" 
 data = []
 
 with open("names/dutch_names.json", 'r') as file:
