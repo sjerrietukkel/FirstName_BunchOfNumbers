@@ -3,7 +3,7 @@
 
 * {
     font-family: 'Zen Old Mincho', serif;
-    color: #171a2f;
+    color: #7e9ec1;
 }
 
 .red {
@@ -19,13 +19,13 @@
 }
 
 .white {
-    background-color: white;
+    background-color: #262e3f;
     border-radius: 8px;
     padding: 32px;
 }
 
 .white-1 {
-    background-color: white;
+    background-color: #262e3f;
     border-radius: 8px;
     padding: 8px 16px 32px 16px;
 }
@@ -48,14 +48,13 @@ p {
 }
 
 body {
-    background-color: #ECE5D8;
+    background-color: #202531;
     padding: 0 50px;
     max-width: 1600px;
     margin: auto;
 }
 
 h1 {
-    color: #171a2f;
     font-size: 30px;
     font-weight: 900;
 }
@@ -99,10 +98,10 @@ h3.tech {
     margin-left: 16px;
 }
 
-#heatmap {
-    background-color: white;
+#heatmap, .graph {
+    background-color: #202531;
     /* border: 1px solid #171a2f; */
-    border-radius: 8px;
+    border-radius: 4px;
 }
 
 .main-svg {
@@ -110,7 +109,7 @@ h3.tech {
  }
 
 .perc-back {
-    background-color: white;
+    background-color: #262e3f;
     border-radius: 8px;
     padding: 0 16px;
     margin: 16px 8px;

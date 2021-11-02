@@ -64,15 +64,17 @@ fig = px.density_heatmap(
             nbinsy= 20,
             marginal_x="box",   
             marginal_y="violin",
-            color_continuous_scale= [ "#004369","#F4E683", "#FDA649",  "#FF8882","#fd5445"]
+            color_continuous_scale= ["#1d2330", "#4aa189",  "#298f71","#2cfcc4"]
 )
 
 fig_pie = px.pie(df, values = "sentiment", names="query")
-fig_hist = px.histogram(df_sen_avg, x="mean", y="count", color="gender")
+fig_hist = px.histogram(df_sen_avg, x="mean", y="count", color="gender", color_discrete_sequence=["#2cfcc4", "#FD5445"])
 
 fig.update_layout(
-    plot_bgcolor='ghostwhite',
+    plot_bgcolor='rgba(4,161,137, .4)',
+    paper_bgcolor='white'
 )
+
 
 # Create QUERY list for populating dcc.Dropdown()
 QUERY = []
@@ -136,7 +138,7 @@ app.layout = html.Div(
         html.Div(className="white", children=([
             dcc.Graph(
                 id="heatmap",
-                className="graph-style",
+                className="graph",
                 figure=fig,
             ),
             html.P("** Taken from complete sample size"),
@@ -152,6 +154,7 @@ app.layout = html.Div(
             dcc.Graph(
                 id="fig_hist",
                 figure=fig_hist,
+                className="graph"
             ),
             html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
         ])
@@ -169,7 +172,11 @@ def updateFigure(value):
     print(df_q_count)
     df_sen_avg = df_query.groupby(["query", "gender"])["sentiment"].agg([ "count"]).reset_index()
     # print(df_sen_avg)
-    fig_hist = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet")
+    fig_hist = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet",color_discrete_sequence=["#2cfcc4", "#FD5445"])
+    fig_hist.update_layout(
+        plot_bgcolor='rgba(4,161,137, .4)',
+        paper_bgcolor='white'
+    )
     return fig_hist
 
  
