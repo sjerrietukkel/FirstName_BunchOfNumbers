@@ -133,11 +133,14 @@ app.layout = html.Div(
         # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
         html.H2("Sentiment compared with amount of followers."),
-        dcc.Graph(
-            id="heatmap",
-            className="graph-style",
-            figure=fig,
-        ),
+        html.Div(className="white", children=([
+            dcc.Graph(
+                id="heatmap",
+                className="graph-style",
+                figure=fig,
+            ),
+            html.P("** Taken from complete sample size"),
+        ])),
         html.H2("Select a #hashtag and I’ll tell you all about it. "),
         html.Div(className="white", children=[
             dcc.Dropdown(
