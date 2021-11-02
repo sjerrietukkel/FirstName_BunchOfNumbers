@@ -145,11 +145,12 @@ app.layout = html.Div(
                 options= [{'label': option, 'value': option}
                 for option in QUERY],
             ),
-            html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
+            html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
             dcc.Graph(
                 id="fig_hist",
                 figure=fig_hist,
-            )
+            ),
+            html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
         ])
     ]
 )
