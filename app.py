@@ -6,6 +6,7 @@ from dash.exceptions import PreventUpdate
 import json 
 import glob
 from dash import dcc
+import plotly.graph_objects as go
 from dash import html
 from dash.dependencies import Input, Output, State
 app = dash.Dash(__name__)
@@ -69,6 +70,7 @@ fig = px.density_heatmap(
 
 fig_pie = px.pie(df, values = "sentiment", names="query")
 fig_hist = px.histogram(df_sen_avg, x="mean", y="count", color="gender", color_discrete_sequence=["#2cfcc4", "#FD5445"])
+fig_ding = px.histogram(df_sen_avg, x="mean", y="count", color="gender", color_discrete_sequence=["#2cfcc4", "#FD5445"])
 
 fig.update_layout(
     plot_bgcolor='rgba(4,161,137, .2)',
@@ -138,24 +140,44 @@ app.layout = html.Div(
         # dcc.Graph(id='graph-output', figure={}),
         html.Div(className="flex-bar1", children=([
             html.Div(className="w50", children=([
-                html.H2("Sentiment compared with amount of followers."),
-                html.Div(className="white", children=([
-                    dcc.Graph(
-                        id="heatmap",
-                        className="graph",
-                        figure=fig,
-                    ),
-                    html.P("** Taken from complete sample size"),
-                ])),
+                    html.H2("Detailed information about a #hashtag"),
+            html.Div(className="white", children=[
+                html.H2("Select a hashtag"),
+                dcc.Dropdown(
+                    id="indiv",
+                    options= [{'label': option, 'value': option}
+                    for option in QUERY],
+                ),
+                html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
+                dcc.Graph(
+                    id="fig_ding",
+                    figure=fig_ding,
+                    className="graph"
+                ),
+                html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
+        ]),    
             ])),
             html.Div(className="w50", children=([
-                html.H2("Select a #hashtag and I’ll tell you all about it. "),
+                html.H2("Compare hashtags"),
                 html.Div(className="white", children=[
-                    dcc.Dropdown(
-                        id="search_input",
-                        options= [{'label': option, 'value': option}
-                        for option in QUERY],
-                    ),
+                    html.Div(className="flex-bar-between", children=[
+                        html.Div(className="w50x", children=[
+                            html.H2("Hashtag 1"),
+                            dcc.Dropdown(
+                                id="search_input",
+                                options= [{'label': option, 'value': option}
+                                for option in QUERY],
+                            ),
+                        ]),
+                        html.Div(className="w50x", children=[
+                            html.H2("Hashtag 2"),
+                            dcc.Dropdown(
+                                id="dropdown",
+                                options= [{'label': option, 'value': option}
+                                for option in QUERY],
+                            ),
+                        ]),
+                    ]),
                     html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
                     dcc.Graph(
                         id="fig_hist",
@@ -166,29 +188,82 @@ app.layout = html.Div(
                 ]),
             ])),
         ])),
+        html.Div(className="w100", children=[
+                html.H2("Sentiment compared with amount of followers."),
+                html.Div(className="white", children=([
+                    dcc.Graph(
+                        id="heatmap",
+                        className="graph",
+                        figure=fig,
+                    ),
+                    html.P("** Taken from complete sample size"),
+                ])),
+        ]),
     ]
 )
 
 @app.callback(
     Output("fig_hist", "figure"),
-    [Input("search_input", "value")]
+    Input("search_input", "value"), 
+    Input("dropdown", "value")
 )
-def updateFigure(value):
+
+def updateFigure(value, value1):
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        print("joehoe")
     df_query = df[df["query"] == value]
-    print(df_query)
-    df_q_count = df_query.groupby("query").count().reset_index()
-    print(df_q_count)
-    df_sen_avg = df_query.groupby(["query", "gender"])["sentiment"].agg([ "count"]).reset_index()
-    # print(df_sen_avg)
-    fig_hist = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet",color_discrete_sequence=["#2cfcc4", "#FD5445"])
+    df_query1 = df[df["query"] == value1]
+    fig_hist = go.Figure()
+    fig_hist.add_trace(go.Histogram(
+        x=df_query["sentiment"],
+        histnorm='percent',
+        name='control', # name used in legend and hover labels
+        xbins=dict( # bins used for histogram
+            start=-1.0,
+            end=1.0,
+            size=0.1
+        ),
+        marker_color='#FD5445',
+        opacity=0.75
+    ))
+    fig_hist.add_trace(go.Histogram(
+        x=df_query1["sentiment"],
+        histnorm='percent',
+        name='control', # name used in legend and hover labels
+        xbins=dict( # bins used for histogram
+            start=-1.0,
+            end=1.0,
+            size=0.1
+        ),
+        marker_color='#2cfcc4',
+        opacity=0.75
+    ))
     fig_hist.update_layout(
+        plot_bgcolor='rgba(4,161,137, .2)',
+    )
+    return fig_hist
+
+@app.callback(
+    Output("fig_ding", "figure"),
+    Input("indiv", "value")
+)
+
+
+def update_graphding(value):
+    df_query = df[df["query"] == value]
+    # df_q_count = df_query.groupby("query").count().reset_index()
+    # df_sen_avg = df_query.groupby(["query", "gender"])["sentiment"].agg([ "count"]).reset_index()
+    graph_ding = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet",color_discrete_sequence=["#2cfcc4", "#FD5445"],)
+    graph_ding.update_layout(
         plot_bgcolor='rgba(4,161,137, .2)',
         paper_bgcolor='white',
         xaxis = {'showgrid': False},
         yaxis = {'showgrid': False},
     )
-    return fig_hist
+    return graph_ding
 
- 
+
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)
+
