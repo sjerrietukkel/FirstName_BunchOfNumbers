@@ -20,13 +20,22 @@
 
 .white {
     background-color: #262e3f;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 32px;
+    width: 91.5%;
 }
 
+.w50 {
+    max-width: 50%;
+    margin: 0 8px;
+}
+.flex-bar1 {
+    display: flex;
+    justify-content: space-between;
+}
 .white-1 {
     background-color: #262e3f;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 8px 16px 32px 16px;
 }
 
@@ -74,12 +83,13 @@ h3.tech {
 }
 
 #search_input {
-    width: 100%;
-    padding: 0 8px;
-    height: 50px;
-    border-radius: 6px;
-    font-size: 20px;
-    border: none;
+    width: 50%;
+    padding: 0 0px;
+    /* height: 50px; */
+    border-radius: 4px;
+    /* background-color: #2F5760; */
+    font-size: 16px;
+    /* border: 1px solid #2cfcc4; */
 }
 
 .flex-bar {
@@ -110,7 +120,7 @@ h3.tech {
 
 .perc-back {
     background-color: #262e3f;
-    border-radius: 8px;
+    border-radius: 4px;
     padding: 0 16px;
     margin: 16px 8px;
 }

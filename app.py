@@ -71,8 +71,10 @@ fig_pie = px.pie(df, values = "sentiment", names="query")
 fig_hist = px.histogram(df_sen_avg, x="mean", y="count", color="gender", color_discrete_sequence=["#2cfcc4", "#FD5445"])
 
 fig.update_layout(
-    plot_bgcolor='rgba(4,161,137, .4)',
-    paper_bgcolor='white'
+    plot_bgcolor='rgba(4,161,137, .2)',
+    paper_bgcolor='white',
+    xaxis =  {'showgrid': False },
+    yaxis = {'showgrid': False}
 )
 
 
@@ -134,30 +136,36 @@ app.layout = html.Div(
         ]),
         # html.Button(id='my-button', n_clicks=0, children="Search"),
         # dcc.Graph(id='graph-output', figure={}),
-        html.H2("Sentiment compared with amount of followers."),
-        html.Div(className="white", children=([
-            dcc.Graph(
-                id="heatmap",
-                className="graph",
-                figure=fig,
-            ),
-            html.P("** Taken from complete sample size"),
+        html.Div(className="flex-bar1", children=([
+            html.Div(className="w50", children=([
+                html.H2("Sentiment compared with amount of followers."),
+                html.Div(className="white", children=([
+                    dcc.Graph(
+                        id="heatmap",
+                        className="graph",
+                        figure=fig,
+                    ),
+                    html.P("** Taken from complete sample size"),
+                ])),
+            ])),
+            html.Div(className="w50", children=([
+                html.H2("Select a #hashtag and I’ll tell you all about it. "),
+                html.Div(className="white", children=[
+                    dcc.Dropdown(
+                        id="search_input",
+                        options= [{'label': option, 'value': option}
+                        for option in QUERY],
+                    ),
+                    html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
+                    dcc.Graph(
+                        id="fig_hist",
+                        figure=fig_hist,
+                        className="graph"
+                    ),
+                    html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
+                ]),
+            ])),
         ])),
-        html.H2("Select a #hashtag and I’ll tell you all about it. "),
-        html.Div(className="white", children=[
-            dcc.Dropdown(
-                id="search_input",
-                options= [{'label': option, 'value': option}
-                for option in QUERY],
-            ),
-            html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
-            dcc.Graph(
-                id="fig_hist",
-                figure=fig_hist,
-                className="graph"
-            ),
-            html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
-        ])
     ]
 )
 
@@ -174,8 +182,10 @@ def updateFigure(value):
     # print(df_sen_avg)
     fig_hist = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet",color_discrete_sequence=["#2cfcc4", "#FD5445"])
     fig_hist.update_layout(
-        plot_bgcolor='rgba(4,161,137, .4)',
-        paper_bgcolor='white'
+        plot_bgcolor='rgba(4,161,137, .2)',
+        paper_bgcolor='white',
+        xaxis = {'showgrid': False},
+        yaxis = {'showgrid': False},
     )
     return fig_hist
 
