@@ -1,5 +1,7 @@
 # FirstName BunchOfNumbers Detector
 
+![screenshot](/assets/screen.png)
+
 ### Installation
 
 ```bash
