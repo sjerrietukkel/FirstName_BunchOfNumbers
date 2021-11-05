@@ -12,6 +12,11 @@ from dash.dependencies import Input, Output, State
 app = dash.Dash(__name__)
 server = app.server
 
+# image_url = []
+#  for filename in glob.iglob('data/*.png', recursive=True):
+#    image_url.append(filename)
+
+
 
 def merge_JsonFiles():
     total_tweet_count = 0
