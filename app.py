@@ -106,7 +106,7 @@ average_followers = math.ceil((df["followers"].sum()) / count)
 
 app.layout = html.Div(
     className="main",
-    children=[
+    children=[ 
         html.Div(className="white-1", children=[
             html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
             html.P("This project is meant to give an insight into the phenomenon FirstName BunchOfNumbers (FB's) on Twitter. When creating an account this will be the default username generated, making it the prime choice for people with negative outings and bots alike. "),
