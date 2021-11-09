@@ -12,13 +12,8 @@ from dash.dependencies import Input, Output, State
 app = dash.Dash(__name__)
 server = app.server
 
-# image_url = []
-#  for filename in glob.iglob('data/*.png', recursive=True):
-#    image_url.append(filename)
 
-
-
-def merge_JsonFiles():
+def merge_JsonFiles(): # Merge all data files in to one
     total_tweet_count = 0
     result = list()
     for filename in glob.iglob('data/*.json', recursive=True):
@@ -32,35 +27,19 @@ totaltweets = merge_JsonFiles()
 
 df = pd.read_json("all_tweets.json")
 
-# remove follower outliers
-cols = ['followers'] # one or more
 
+
+# remove follower outliers https://stackoverflow.com/questions/35827863/remove-outliers-in-pandas-dataframe-using-percentiles
+cols = ['followers']
 Q1 = df[cols].quantile(0)
 Q3 = df[cols].quantile(0.9)
 IQR = Q3 - Q1
-
 df_fol = df[~((df[cols] < (Q1 - 1.5 * IQR)) |(df[cols] > (Q3 + 1.5 * IQR))).any(axis=1)]
 
-# print(df_fol["followers"])
-# print(df)
 sentiment = df_fol["sentiment"]
 fol = df_fol["followers"]
 
-df_sen_avg = df
-# df_temp = df.groupby('query').size().to_frame('count')
-# df_temp = df_temp.iloc[1:, :]
-# print(df_temp)
-df_sen_avg = df_sen_avg.groupby(["query", "gender"],)["sentiment"].agg(["mean", "count"]).reset_index()
-# df_sen_avg["count"] = df_temp["count"]
-
-
-# s = df_temp['item_id'].map(df_item.set_index('item_id')['item_name'])
-# df = df_bill.drop('item_id', 1).assign(item_name = s)
-
-
-# print(df_sen_avg)
-# print(df_gen_avg)
-# print("hierboven")
+df_sen_avg = df.groupby(["query", "gender"],)["sentiment"].agg(["mean", "count"]).reset_index()
 
 fig = px.density_heatmap(
             df,
@@ -99,6 +78,7 @@ retweet_count = math.ceil(retweet_count * 100)
 male_count = df['gender'].value_counts(normalize=True).mul(100)
 male_perc = math.ceil(male_count["male"])
 average_followers = math.ceil((df["followers"].sum()) / count)
+
 
 app.layout = html.Div(
     className="main",
@@ -141,8 +121,6 @@ app.layout = html.Div(
                 html.H4("tweets scanned", className="percentage_expl"),
             ]),
         ]),
-        # html.Button(id='my-button', n_clicks=0, children="Search"),
-        # dcc.Graph(id='graph-output', figure={}),
         html.Div(className="flex-bar1", children=([
             html.Div(className="w50", children=([
                     html.H2("Detailed information about a #hashtag"),
@@ -150,7 +128,7 @@ app.layout = html.Div(
                 html.H2("Select a hashtag"),
                 dcc.Dropdown(
                     id="indiv",
-                    options= [{'label': option, 'value': option}
+                    options= [{'label': option, 'value': option} # loop over QUERY list for population
                     for option in QUERY],
                 ),
                 html.P("Sentiment ranges from: -1 <-> -.5 = very negative, -.5 <-> -.2 = negative, -.2 <-> .2 = neutral, .2 <-> .5 = positive, .5 <-> 1 = very positive."),
@@ -168,9 +146,9 @@ app.layout = html.Div(
                     html.Div(className="flex-bar-between", children=[
                         html.Div(className="w50x", children=[
                             html.H2("Hashtag 1"),
-                            dcc.Dropdown(
+                            dcc.Dropdown( 
                                 id="search_input",
-                                options= [{'label': option, 'value': option}
+                                options= [{'label': option, 'value': option} # loop over QUERY list for population
                                 for option in QUERY],
                             ),
                         ]),
@@ -178,7 +156,7 @@ app.layout = html.Div(
                             html.H2("Hashtag 2"),
                             dcc.Dropdown(
                                 id="dropdown",
-                                options= [{'label': option, 'value': option}
+                                options= [{'label': option, 'value': option} # loop over QUERY list for population
                                 for option in QUERY],
                             ),
                         ]),
@@ -204,6 +182,9 @@ app.layout = html.Div(
                     html.P("** Taken from complete sample size"),
                 ])),
         ]),
+        html.Footer(className="footert", children=[
+            html.P("Daniel van der Schuur, 1811230", className="center")
+        ]),
     ]
 )
 
@@ -216,14 +197,14 @@ app.layout = html.Div(
 def updateFigure(value, value1):
     ctx = dash.callback_context
     if not ctx.triggered:
-        print("joehoe")
+        print("")
     df_query = df[df["query"] == value]
     df_query1 = df[df["query"] == value1]
     fig_hist = go.Figure()
     fig_hist.add_trace(go.Histogram(
         x=df_query["sentiment"],
-        histnorm='percent',
-        name='control', # name used in legend and hover labels
+        histnorm='',
+        name=value, # name used in legend and hover labels
         xbins=dict( # bins used for histogram
             start=-1.0,
             end=1.0,
@@ -234,8 +215,8 @@ def updateFigure(value, value1):
     ))
     fig_hist.add_trace(go.Histogram(
         x=df_query1["sentiment"],
-        histnorm='percent',
-        name='control', # name used in legend and hover labels
+        histnorm='',
+        name=value1, # name used in legend and hover labels
         xbins=dict( # bins used for histogram
             start=-1.0,
             end=1.0,
@@ -257,8 +238,6 @@ def updateFigure(value, value1):
 
 def update_graphding(value):
     df_query = df[df["query"] == value]
-    # df_q_count = df_query.groupby("query").count().reset_index()
-    # df_sen_avg = df_query.groupby(["query", "gender"])["sentiment"].agg([ "count"]).reset_index()
     graph_ding = px.histogram(df_query, x='sentiment', color='gender', range_x=[-1, 1], nbins=20, pattern_shape="retweet",color_discrete_sequence=["#2cfcc4", "#FD5445"],)
     graph_ding.update_layout(
         plot_bgcolor='rgba(4,161,137, .2)',

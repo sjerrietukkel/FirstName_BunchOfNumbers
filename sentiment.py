@@ -1,5 +1,8 @@
 from google.cloud import language_v1
 
+# code from https://cloud.google.com/natural-language/docs/reference/rest 
+# tweaked a bit to fit my usecase
+
 def translate_text(target, text):
     """Translates text into the target language."""
     import six
