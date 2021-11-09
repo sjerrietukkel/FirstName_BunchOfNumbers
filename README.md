@@ -29,6 +29,7 @@ Navigate to folder and run (bash)
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS='creds.json'
 clear `data` and `data_all`
+change query variable in final.py and all_tweets.py
 python final.py & all_tweets.py
 ```
 

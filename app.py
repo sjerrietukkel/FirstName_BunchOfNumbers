@@ -109,7 +109,7 @@ app.layout = html.Div(
     children=[
         html.Div(className="white-1", children=[
             html.H1("Hi, my name is Firstname Bunchofnumbers, nice to meet you!"),
-            html.P("This project is meant to give an insight into the phenomenon FirstName BunchOfNumbers on Twitter. When creating an account this will be the default username generated, making it the prime choice for people with negative outings and bots alike. "),
+            html.P("This project is meant to give an insight into the phenomenon FirstName BunchOfNumbers (FB's) on Twitter. When creating an account this will be the default username generated, making it the prime choice for people with negative outings and bots alike. "),
             html.P("Caveats to take into consideration: The data is retrieved from Dutch Twitters users and the script will only detect Dutch first names scraped from http://www.naamkunde.net/. The sample data below was gathered amidst the Covid-19 pandemic during October 2021."),
             html.H3("Stack used:", className="tech"),
             html.Div(className="flexbar", children=([
