@@ -20,14 +20,30 @@ def merge_JsonFiles(): # Merge all data files in to one
         total_tweet_count = total_tweet_count + 1000
         with open(filename, 'r') as infile:
             result.extend(json.load(infile))
-    with open('all_tweets.json', 'w') as output_file:
+    with open('combined_data/combined_tweets.json', 'w') as output_file:
         json.dump(result, output_file)
     return total_tweet_count
 totaltweets = merge_JsonFiles()
 
-df = pd.read_json("all_tweets.json")
+df = pd.read_json("combined_data/combined_tweets.json")
 
 
+def merge_JsonFiles_all(): # Merge all data files in to one
+    total_tweet_count = 0
+    result = list()
+    for filename in glob.iglob('data_all/*.json', recursive=True):
+        total_tweet_count = total_tweet_count + 1000
+        with open(filename, 'r') as infile:
+            result.extend(json.load(infile))
+    with open('combined_data/combined_full_tweets_all.json', 'w') as output_file:
+        json.dump(result, output_file)
+    return total_tweet_count
+totaltweets_all = merge_JsonFiles_all()
+
+df_all = pd.read_json('combined_data/combined_full_tweets_all.json')
+
+print(df_all["sentiment"].agg('mean'))
+print(df["sentiment"].agg('mean'))
 
 # remove follower outliers https://stackoverflow.com/questions/35827863/remove-outliers-in-pandas-dataframe-using-percentiles
 cols = ['followers']
@@ -70,6 +86,14 @@ for o in df["query"]:
     QUERY.append(o)
 QUERY = list(dict.fromkeys(QUERY))
 
+
+# Create list for populating comparison chart
+QUERY_COMPARISON = []
+for o in df_all["query"]:
+    QUERY_COMPARISON.append(o)
+QUERY_COMPARISON = list(dict.fromkeys(QUERY_COMPARISON))
+
+
 # top bar information about the entire dataset
 count = df["screen_name"].count()
 total_count = round((count/totaltweets) * 100, 1)
@@ -98,7 +122,7 @@ app.layout = html.Div(
                 html.P("Heroku", className="tag"),
             ])),
         ]),
-        html.H2("Information about all retreived tweets :", className="information-bar"),
+        html.H2("Information about all retreived tweets:", className="information-bar"),
         html.Div(className="flex-bar", children=[
             html.Div(className="flex-bar perc-back", children=[
                 html.H3(str(total_count) + "%", className="red percentage"),
@@ -125,7 +149,7 @@ app.layout = html.Div(
             html.Div(className="w50", children=([
                     html.H2("Detailed information about a #hashtag"),
             html.Div(className="white", children=[
-                html.H2("Select a hashtag"),
+                html.H2("Select a hashtag:"),
                 dcc.Dropdown(
                     id="indiv",
                     options= [{'label': option, 'value': option} # loop over QUERY list for population
@@ -141,23 +165,15 @@ app.layout = html.Div(
         ]),    
             ])),
             html.Div(className="w50", children=([
-                html.H2("Compare hashtags"),
+                html.H2("Compare hashtag with all results"),
                 html.Div(className="white", children=[
                     html.Div(className="flex-bar-between", children=[
                         html.Div(className="w50x", children=[
-                            html.H2("Hashtag 1"),
+                            html.H2("Select a hashtag:"),
                             dcc.Dropdown( 
                                 id="search_input",
                                 options= [{'label': option, 'value': option} # loop over QUERY list for population
-                                for option in QUERY],
-                            ),
-                        ]),
-                        html.Div(className="w50x", children=[
-                            html.H2("Hashtag 2"),
-                            dcc.Dropdown(
-                                id="dropdown",
-                                options= [{'label': option, 'value': option} # loop over QUERY list for population
-                                for option in QUERY],
+                                for option in QUERY_COMPARISON],
                             ),
                         ]),
                     ]),
@@ -167,7 +183,7 @@ app.layout = html.Div(
                         figure=fig_hist,
                         className="graph"
                     ),
-                    html.P(" ** For generating data based on hashtags of your choice please check out the README.md file over on https://github.com/sjerrietukkel/FirstName_BunchOfNumbers"),
+                    html.P(" ** Comparison not available for all retrieved hashtags, due to technical issues. Values are shown in percentages, 50 tweets retrieved from all."),
                 ]),
             ])),
         ])),
@@ -191,20 +207,19 @@ app.layout = html.Div(
 @app.callback(
     Output("fig_hist", "figure"),
     Input("search_input", "value"), 
-    Input("dropdown", "value")
 )
 
-def updateFigure(value, value1):
+def updateFigure(value):
     ctx = dash.callback_context
     if not ctx.triggered:
         print("")
     df_query = df[df["query"] == value]
-    df_query1 = df[df["query"] == value1]
+    df_query1 = df_all[df_all["query"] == value]
     fig_hist = go.Figure()
     fig_hist.add_trace(go.Histogram(
         x=df_query["sentiment"],
-        histnorm='',
-        name=value, # name used in legend and hover labels
+        histnorm='percent',
+        name="FB's", # name used in legend and hover labels
         xbins=dict( # bins used for histogram
             start=-1.0,
             end=1.0,
@@ -215,8 +230,8 @@ def updateFigure(value, value1):
     ))
     fig_hist.add_trace(go.Histogram(
         x=df_query1["sentiment"],
-        histnorm='',
-        name=value1, # name used in legend and hover labels
+        histnorm='percent',
+        name="All Tweets", # name used in legend and hover labels
         xbins=dict( # bins used for histogram
             start=-1.0,
             end=1.0,

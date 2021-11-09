@@ -8,7 +8,7 @@ auth = tweepy.OAuthHandler(config["CONSUMER_KEY"], config["CONSUMER_KEY_SECRET"]
 auth.set_access_token(config["ACCESS_TOKEN"], config["ACCESS_TOKEN_SECRET"])
 api = tweepy.API(auth)
 
-query = "klimaat" 
+query = "belastingdienst" 
 data = []
 
 with open("names/dutch_names.json", 'r') as file:
@@ -24,7 +24,7 @@ def clean_tweets(tweet):
     clean_tweet = (' '.join(words)).strip()
     return clean_tweet
 
-for tweets in tweepy.Cursor(api.search_tweets, q=query, count=100, lang="nl", tweet_mode='extended', result_type="latest").pages(5):
+for tweets in tweepy.Cursor(api.search_tweets, q=query, count=50, lang="nl", tweet_mode='extended', result_type="latest").pages(1):
     total = 0
     total_found = 0
     for tweet in tweets:
@@ -80,6 +80,6 @@ for tweets in tweepy.Cursor(api.search_tweets, q=query, count=100, lang="nl", tw
         
 
 print(total)
-filename = 'data/tweets_all_' + query +'.json'
+filename = 'data_all/tweets_all_' + query +'.json'
 with open (filename, 'w', encoding='utf8') as outfile:
     json.dump(data, outfile)
