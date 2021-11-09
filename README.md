@@ -28,5 +28,14 @@ Navigate to folder and run (bash)
 
 ```bash
 export GOOGLE_APPLICATION_CREDENTIALS='creds.json'
-python final.py
+clear `data` and `data_all`
+python final.py & all_tweets.py
+```
+
+### Run Demo
+
+```bash
+git clone
+pip install -r requirement.txt
+python app.py
 ```
